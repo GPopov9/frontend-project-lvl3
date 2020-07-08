@@ -17,7 +17,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'RSS Reader',
       template: 'template.html',
-      filename: 'index.html',
     }),
   ],
 };
