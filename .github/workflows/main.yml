@@ -1,47 +1,46 @@
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
-# For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
+# Name of workflow
+name: Node CI
 
-name: Node.js Package
-
+# Trigger the workflow on push or pull request
 on:
-  release:
-    types: [created]
+  - push
+  - pull_request
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - run: npm ci
-      - run: npm test
 
-  publish-npm:
-    needs: build
+    # The type of machine to run the job on
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-          registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
 
-  publish-gpr:
-    needs: build
-    runs-on: ubuntu-latest
+    strategy:
+      # Node versions list
+      matrix:
+        node-version: [13.x]
+
     steps:
+      # Check-out repository under GitHub workspace
+      # https://github.com/actions/checkout
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+        # Step's name
+      - name: Use Node.js ${{ matrix.node-version }}
+        # Configures the node version used on GitHub-hosted runners
+        # https://github.com/actions/setup-node
+        uses: actions/setup-node@v1
+        # The Node.js version to configure
         with:
-          node-version: 12
-          registry-url: https://npm.pkg.github.com/
-      - run: npm ci
-      - run: npm publish
+          node-version: ${{ matrix.node-version }}
+
+      - name: npm install, build
+        # Install and build project
+        run: |
+          make install
+          make build
+        # Add environment variables
         env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          CI: true
+
+      - name: Run linter
+        run: make lint
+
+      - name: Run tests
+        run: make test
