@@ -1,0 +1,1 @@
+![Node CI](https://github.com/GPopov9/frontend-project-lvl3/workflows/Node%20CI/badge.svg)
