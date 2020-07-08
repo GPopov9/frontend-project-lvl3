@@ -1,1 +1,5 @@
-console.log('Hello World');
+// @ts-check
+
+import init from './init';
+
+init();
