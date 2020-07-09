@@ -7,14 +7,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hexlet-boilerplates/webpack-package.git"
+    "url": "git+https://github.com/GPopov9/frontend-project-lvl3"
   },
   "author": "Georgy Popov",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/hexlet-boilerplates/webpack-package/issues"
+    "url": "https:https://github.com/GPopov9/frontend-project-lvl3/issues"
   },
-  "homepage": "https://github.com/hexlet-boilerplates/webpack-package#readme",
+  "homepage": "https://github.com/GPopov9/frontend-project-lvl3/#readme",
   "jest": {
     "verbose": true,
     "testURL": "http://localhost/"
