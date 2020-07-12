@@ -21,13 +21,18 @@
     "testURL": "http://localhost/"
   },
   "dependencies": {
+    "axios": "^0.19.2",
     "bootstrap": "^4.5.0",
     "jquery": "^3.5.1",
-    "popper.js": "^1.16.1"
+    "lodash": "^4.17.19",
+    "on-change": "^2.0.1",
+    "popper.js": "^1.16.1",
+    "yup": "^0.29.1"
   },
   "devDependencies": {
     "@babel/core": "^7.10.3",
     "@babel/preset-env": "^7.10.3",
+    "@types/lodash": "^4.14.157",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.1.0",
     "babel-loader": "^8.1.0",

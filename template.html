@@ -4,10 +4,10 @@
     <title>RSS Reader</title>
   </head>
   <body>
-    <div class="container" >
+    <div class="container-fluid" style="background-color:#343A40">
       <div class="row">
-        <div class="col-2"></div>
-        <div class="col-8">
+        <div class="col-3"></div>
+        <div class="col-6">
           <div class="jumbotron" style="background-color:#343A40">
             <h1 class="display-4" style="color:white">RSS Reader</h1>
             <p class="lead" style="color:white">Start reading RSS today! It is easy, it is nicely.</p>
@@ -15,18 +15,19 @@
               <div class="form-group">
                 <div class="row">
                   <div class="col-10">
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="RSS Link">
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="RSS Link">
+                    <div class="invalid-feedback">this must be a valid URL</div>
                     <small id="emailHelp" class="form-text text-muted">Example: https://ru.hexlet.io/lessons.rss</small>
                   </div>
-                  <div class="col-2">
+                  <div >
                     <button type="submit" class="btn btn-primary">ADD</button>
                   </div>
-                </div>
+                </div> 
               </div>                          
             </form>
-          </div>
+          </div>                    
         </div>
-        <div class="col-2"></div>
+        <div class="col-3"></div>
       </div>
      
             
