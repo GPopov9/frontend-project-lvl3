@@ -131,6 +131,10 @@ export default () => {
           diff.forEach((item) => state.data.posts.unshift(item));
           watchedState.form.processState = 'completed';
           resetState();
+        })
+        .catch((err) => {
+          watchedState.form.processState = 'failed';
+          watchedState.form.processError = err.message;
         });
     });
     setTimeout(refresher, 5000);
