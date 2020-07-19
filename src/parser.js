@@ -1,15 +1,28 @@
 const getFeed = (data) => {
-  const titleRSS = data.querySelector('channel > title');
-  const descriptionRSS = data.querySelector('channel > description');
-  const title = titleRSS.textContent;
-  const description = descriptionRSS.textContent;
-  return {title, description};
+  const titleFeed = data.querySelector('channel > title');
+  const descriptionFeed = data.querySelector('channel > description');
+  const title = titleFeed.textContent;
+  const description = descriptionFeed.textContent;
+  return { title, description };
 };
 
-// Parser 
+const getPosts = (data) => {
+  const items = [...data.querySelectorAll('item')];
+  return items.map((item) => {
+    const titlePost = item.querySelector('title');
+    const descriptionPost = item.querySelector('description');
+    const linkPost = item.querySelector('link');
+    const title = titlePost.textContent;
+    const description = descriptionPost.textContent;
+    const link = linkPost.textContent;
+    return { title, description, link };
+  });
+};
+
 export default (data) => {
   const parse = new DOMParser();
   const rssData = parse.parseFromString(data, 'text/xml');
   const feed = getFeed(rssData);
-  return feed;
+  const posts = getPosts(rssData);
+  return { feed, posts };
 };
