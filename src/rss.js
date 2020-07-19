@@ -107,9 +107,9 @@ export default () => {
         resetState();
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err.message);
         watchedState.form.processState = 'failed';
-        watchedState.form.processError = err.response.status;
+        watchedState.form.processError = err.message;
       });
   });
 
@@ -117,7 +117,6 @@ export default () => {
     if (state.data.feeds === []) {
       return;
     }
-
     state.data.feeds.forEach((feed) => {
       const oldPosts = state.data.posts.filter((post) => post.id === feed.id);
       const url = getURL(feed.link);
@@ -128,15 +127,10 @@ export default () => {
           return newPosts.map((post) => ({ id: feed.id, ...post }));
         })
         .then((newPosts) => {
-          if (_.isEqual(oldPosts, newPosts)) {
-            console.log('all the same');
-            console.log(state.form.processState);
-            return;
-          }
-          state.data.posts.filter((post) => post !== feed.id);
-          newPosts.forEach((post) => state.data.posts.push(post));
+          const diff = _.differenceWith(newPosts, oldPosts, _.isEqual);
+          diff.forEach((item) => state.data.posts.unshift(item));
           watchedState.form.processState = 'completed';
-          console.log(state.form.processState);
+          resetState();
         });
     });
     setTimeout(refresher, 5000);
