@@ -16,7 +16,6 @@ const state = {
     processState: 'processing',
     processError: null,
     inputValue: '',
-    isValid: false,
   },
   data: {
     feeds: [],
@@ -59,11 +58,8 @@ const watchedState = onChange(state, (path, value) => {
     case 'form.processState':
       processStateHandler(value);
       break;
-    case 'form.isValid':
-      submitButton.disabled = !value;
-      break;
     case 'form.processError':
-      renderErrors(input, value);
+      renderErrors(input, submitButton, value);
       break;
     default:
       break;
@@ -73,7 +69,6 @@ const watchedState = onChange(state, (path, value) => {
 const resetState = () => {
   state.form.processState = 'processing';
   state.form.processError = null;
-  state.form.isValid = false;
 };
 
 export default () => {
@@ -88,8 +83,8 @@ export default () => {
   input.addEventListener('input', (e) => {
     state.form.inputValue = e.target.value;
     const error = validate(state.data.feeds, state.form);
-    watchedState.form.isValid = _.isEqual(error, null);
     watchedState.form.processError = error;
+    resetState();
   });
 
   form.addEventListener('submit', (e) => {
@@ -104,40 +99,46 @@ export default () => {
         posts.forEach((post) => state.data.posts.push({ id, ...post }));
         watchedState.form.processState = 'completed';
         form.reset();
-        resetState();
       })
       .catch((err) => {
         console.log(err.message);
         watchedState.form.processState = 'failed';
         watchedState.form.processError = err.message;
+        form.reset();
       });
   });
 
   const refresher = () => {
-    if (state.data.feeds === []) {
-      return;
-    }
-    state.data.feeds.forEach((feed) => {
-      const oldPosts = state.data.posts.filter((post) => post.id === feed.id);
+    const requests = state.data.feeds.map((feed) => {
       const url = getURL(feed.link);
-      axios.get(url)
-        .then((response) => {
-          const { posts } = parse(response.data);
-          const newPosts = posts;
-          return newPosts.map((post) => ({ id: feed.id, ...post }));
-        })
-        .then((newPosts) => {
-          const diff = _.differenceWith(newPosts, oldPosts, _.isEqual);
-          diff.forEach((item) => state.data.posts.unshift(item));
-          watchedState.form.processState = 'completed';
-          resetState();
-        })
-        .catch((err) => {
-          watchedState.form.processState = 'failed';
-          watchedState.form.processError = err.message;
-        });
+      return axios.get(url, {
+        params: {
+          id: feed.id,
+        },
+      });
     });
-    setTimeout(refresher, 5000);
+    axios.all(requests)
+      .then((responses) => {
+        const newPostsAll = _.flatten(responses.map((response) => {
+          const feedId = response.config.params.id;
+          const oldPosts = state.data.posts.filter((post) => post.id === feedId);
+          const { posts } = parse(response.data);
+          const newPosts = posts.map((post) => ({ id: feedId, ...post }));
+          const diff = _.differenceWith(newPosts, oldPosts, _.isEqual);
+          return diff;
+        }));
+        if (newPostsAll !== []) {
+          newPostsAll.forEach((item) => state.data.posts.unshift(item));
+        }
+        watchedState.form.processState = 'completed';
+        resetState();
+        setTimeout(refresher, 5000);
+      })
+      .catch((err) => {
+        watchedState.form.processState = 'failed';
+        watchedState.form.processError = err.message;
+        setTimeout(refresher, 5000);
+      });
   };
   setTimeout(refresher, 5000);
 };
