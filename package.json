@@ -2,9 +2,6 @@
   "name": "rss-reader",
   "version": "0.1.0",
   "description": "RSS Reader (3rd project from Hexlet)",
-  "scripts": {
-    "build": "webpack"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/GPopov9/frontend-project-lvl3"
