@@ -1,18 +1,20 @@
 import i18next from 'i18next';
 
-export default (input, submit, error) => {
-  const invalid = document.querySelector('div.invalid-feedback');
+const submitButton = document.querySelector('button.btn');
+const invalid = document.querySelector('div.invalid-feedback');
+
+export default (input, error) => {
   invalid.innerHTML = '';
   switch (error) {
     /* eslint-disable no-param-reassign */
     case 'noErrors':
       input.classList.remove('is-invalid');
-      submit.disabled = false;
+      submitButton.disabled = false;
       break;
     case 'validationError':
       input.classList.add('is-invalid');
       invalid.textContent = i18next.t('errors.invalid');
-      submit.disabled = true;
+      submitButton.disabled = true;
       break;
     /* eslint-enable no-param-reassign */
     case 'Request failed with status code 404':

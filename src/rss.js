@@ -7,8 +7,7 @@ import axios from 'axios';
 import parse from './parser';
 import en from './locale';
 import renderErrors from './renderErrors';
-import renderFeeds from './renderFeeds';
-import renderPosts from './renderPosts';
+import render from './renderData';
 import validate from './validate';
 
 const state = {
@@ -30,36 +29,15 @@ const proxy = {
 const getURL = (data) => `${proxy.path}/${data}`;
 
 const input = document.querySelector('input.form-control');
-const submitButton = document.querySelector('button.btn');
 const form = document.querySelector('form');
-
-const processStateHandler = (processState) => {
-  switch (processState) {
-    case 'failed':
-      submitButton.disabled = false;
-      break;
-    case 'processing':
-      submitButton.disabled = true;
-      break;
-    case 'downloading':
-      submitButton.disabled = true;
-      break;
-    case 'completed':
-      renderFeeds(state.data);
-      renderPosts(state.data);
-      break;
-    default:
-      throw new Error(`Unknown state: ${processState}`);
-  }
-};
 
 const watchedState = onChange(state, (path, value) => {
   switch (path) {
     case 'form.processState':
-      processStateHandler(value);
+      render(value, state.data);
       break;
     case 'form.processError':
-      renderErrors(input, submitButton, value);
+      renderErrors(input, value);
       break;
     default:
       break;
@@ -101,14 +79,13 @@ export default () => {
         form.reset();
       })
       .catch((err) => {
-        console.log(err.message);
         watchedState.form.processState = 'failed';
         watchedState.form.processError = err.message;
         form.reset();
       });
   });
 
-  const refresher = () => {
+  const updatePosts = () => {
     const requests = state.data.feeds.map((feed) => {
       const url = getURL(feed.link);
       return axios.get(url, {
@@ -127,18 +104,18 @@ export default () => {
           const diff = _.differenceWith(newPosts, oldPosts, _.isEqual);
           return diff;
         }));
-        if (newPostsAll !== []) {
+        if (newPostsAll.length !== 0) {
           newPostsAll.forEach((item) => state.data.posts.unshift(item));
         }
         watchedState.form.processState = 'completed';
         resetState();
-        setTimeout(refresher, 5000);
+        setTimeout(updatePosts, 5000);
       })
       .catch((err) => {
         watchedState.form.processState = 'failed';
         watchedState.form.processError = err.message;
-        setTimeout(refresher, 5000);
+        setTimeout(updatePosts, 5000);
       });
   };
-  setTimeout(refresher, 5000);
+  setTimeout(updatePosts, 5000);
 };

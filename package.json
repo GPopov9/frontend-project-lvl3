@@ -1,9 +1,8 @@
 {
   "name": "rss-reader",
   "version": "0.1.0",
-  "description": "",
+  "description": "RSS Reader (3rd project from Hexlet)",
   "scripts": {
-    "test": "jest --colors",
     "build": "webpack"
   },
   "repository": {
