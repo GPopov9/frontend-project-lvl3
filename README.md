@@ -14,5 +14,4 @@ $ make develop
 ```
 
 ## Link
-https://vercel.com/gpopov9/frontend-project-lvl3/9ffgsme2u
-
+https://frontend-project-lvl3.gpopov9.vercel.app/
