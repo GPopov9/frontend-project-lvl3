@@ -1,15 +1,7 @@
 import * as yup from 'yup';
 
-export default (feeds, form) => {
+export default (url, feeds) => {
   const links = feeds.map(({ link }) => link);
-  const schema = yup.object().shape({
-    inputValue: yup.string().url().matches(/rss\b/)
-      .notOneOf(links),
-  });
-  try {
-    schema.validateSync(form, { abortEarly: false });
-    return 'noErrors';
-  } catch (err) {
-    return 'validationError';
-  }
+  const schema = yup.string().url().matches(/rss\b/).notOneOf(links);
+  return schema.isValid(url);
 };

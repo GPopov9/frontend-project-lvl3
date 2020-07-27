@@ -2,6 +2,10 @@
   "name": "rss-reader",
   "version": "0.1.0",
   "description": "RSS Reader (3rd project from Hexlet)",
+  "scripts": {
+    "build": "rm -rf dist | NODE_ENV=production npx webpack",
+    "lint": "npx eslint ."
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/GPopov9/frontend-project-lvl3"
@@ -12,10 +16,6 @@
     "url": "https:https://github.com/GPopov9/frontend-project-lvl3/issues"
   },
   "homepage": "https://github.com/GPopov9/frontend-project-lvl3/#readme",
-  "jest": {
-    "verbose": true,
-    "testURL": "http://localhost/"
-  },
   "dependencies": {
     "axios": "^0.19.2",
     "bootstrap": "^4.5.0",
