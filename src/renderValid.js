@@ -1,7 +1,6 @@
 const submitButton = document.querySelector('button.btn');
 
-export default (state, input) => {
-  const { valid } = state.form;
+export default (valid, input) => {
   if (valid) {
     input.classList.remove('is-invalid');
     submitButton.disabled = !valid;

@@ -8,7 +8,7 @@ import renderPosts from './renderPosts';
 export default (state, input) => onChange(state, (path, value) => {
   switch (path) {
     case 'form.valid':
-      renderValid(state, input);
+      renderValid(value, input);
       break;
     case 'form.errors':
       renderErrors(value, input);

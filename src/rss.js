@@ -47,8 +47,7 @@ const updatePosts = () => {
         const oldPosts = state.data.posts.filter((post) => post.id === feedId);
         const { posts } = parse(response.data);
         const newPosts = posts.map((post) => ({ id: feedId, ...post }));
-        const diff = _.differenceWith(newPosts, oldPosts, _.isEqual);
-        return diff;
+        return _.differenceWith(newPosts, oldPosts, _.isEqual);
       }));
       if (newPostsAll.length !== 0) {
         newPostsAll.forEach((item) => watchedState.data.posts.unshift(item));
