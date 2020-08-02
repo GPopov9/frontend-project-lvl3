@@ -1,11 +1,10 @@
-const submitButton = document.querySelector('button.btn');
-
-export default (valid, input) => {
+export default (valid, input, submitButton) => {
   if (valid) {
     input.classList.remove('is-invalid');
-    submitButton.disabled = !valid;
+    /* eslint-disable no-param-reassign */
+    submitButton.disabled = false;
   } else {
     input.classList.add('is-invalid');
-    submitButton.disabled = !valid;
+    submitButton.disabled = true;
   }
 };

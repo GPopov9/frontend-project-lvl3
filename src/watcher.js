@@ -5,16 +5,16 @@ import renderProcess from './renderProcess';
 import renderFeeds from './renderFeeds';
 import renderPosts from './renderPosts';
 
-export default (state, input) => onChange(state, (path, value) => {
+export default (state, input, submitButton, invalid) => onChange(state, (path, value) => {
   switch (path) {
     case 'form.valid':
-      renderValid(value, input);
+      renderValid(value, input, submitButton);
       break;
     case 'form.errors':
-      renderErrors(value, input);
+      renderErrors(value, invalid);
       break;
     case 'form.process':
-      renderProcess(value, input);
+      renderProcess(value, input, submitButton);
       break;
     case 'data.feeds':
       renderFeeds(state.data.feeds);
@@ -23,6 +23,6 @@ export default (state, input) => onChange(state, (path, value) => {
       renderPosts(state.data.posts);
       break;
     default:
-      break;
+      throw new Error(`Unknown path state: '${path}'!`);
   }
 });

@@ -1,21 +1,17 @@
 import i18next from 'i18next';
-
-const invalid = document.querySelector('div.invalid-feedback');
-
-export default (error, input) => {
+/* eslint-disable no-param-reassign */
+export default (error, invalid) => {
   invalid.innerHTML = '';
   switch (error) {
     case null:
-      input.classList.remove('is-invalid');
       break;
-    case 'validationError':
+    case 'ValidationError':
       invalid.textContent = i18next.t('errors.invalid');
       break;
-    case 'undefined':
+    case 'Not Found':
       invalid.textContent = i18next.t('errors.undefined');
       break;
-    case 'network':
-      input.classList.add('is-invalid');
+    case 'Network Error':
       invalid.textContent = i18next.t('errors.network');
       break;
     default:
