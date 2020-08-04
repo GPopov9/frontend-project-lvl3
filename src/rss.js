@@ -18,7 +18,7 @@ export default () => {
     form: {
       process: 'processing',
       valid: true,
-      errors: null,
+      errors: [],
     },
     data: {
       feeds: [],
@@ -56,7 +56,11 @@ export default () => {
         }
       })
       .catch((err) => {
-        watchedState.form.errors = err.message;
+        if (err.message === 'Network Error') {
+          watchedState.form.errors = [i18next.t('errors.network')];
+        } else {
+          throw new Error(`Unknown error status: '${err.message}'!`);
+        }
         watchedState.form.valid = false;
       })
       .finally(() => setTimeout(updatePosts, 5000));
@@ -76,7 +80,7 @@ export default () => {
   input.addEventListener('input', (e) => {
     watchedState.form.process = 'processing';
     watchedState.form.errors = validate(e.target.value, state.data.feeds);
-    if (validate(e.target.value, state.data.feeds) === null) {
+    if (validate(e.target.value, state.data.feeds).length === 0) {
       watchedState.form.valid = true;
     } else {
       watchedState.form.valid = false;
@@ -96,8 +100,14 @@ export default () => {
         watchedState.form.process = 'completed';
       })
       .catch((err) => {
-        watchedState.form.errors = err.response.statusText;
+        const errStatus = err.response.status;
+        if (errStatus === 404) {
+          watchedState.form.errors = [i18next.t('errors.undefined')];
+        } else {
+          throw new Error(`Unknown error status: '${errStatus}'!`);
+        }
         watchedState.form.valid = false;
+        watchedState.form.process = 'failed';
       });
   });
 };

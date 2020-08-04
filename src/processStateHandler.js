@@ -9,6 +9,10 @@ export default (process, input, submitButton) => {
       submitButton.disabled = true;
       input.disabled = true;
       break;
+    case 'failed':
+      submitButton.disabled = true;
+      input.disabled = false;
+      break;
     case 'completed':
       input.value = '';
       input.disabled = false;
