@@ -1,33 +1,35 @@
 import onChange from 'on-change';
-import renderErrors from './renderErrors';
 import processStateHandler from './processStateHandler';
-import renderFeeds from './renderFeeds';
-import renderPosts from './renderPosts';
+import { renderErrors, renderData } from './render';
 
-export default (state, input, submitButton, invalid) => onChange(state, (path, value) => {
+const renderValid = (value, input, submitButton) => {
+  /* eslint-disable no-param-reassign */
+  if (value) {
+    input.classList.remove('is-invalid');
+    submitButton.disabled = false;
+  } else {
+    input.classList.add('is-invalid');
+    submitButton.disabled = true;
+  }
+  /* eslint-enable no-param-reassign */
+};
+
+export default (state, input, elements) => onChange(state, (path, value) => {
   switch (path) {
     case 'form.valid':
-      /* eslint-disable no-param-reassign */
-      if (value) {
-        input.classList.remove('is-invalid');
-        submitButton.disabled = false;
-      } else {
-        input.classList.add('is-invalid');
-        submitButton.disabled = true;
-      }
+      renderValid(value, input, elements.submitButton);
       break;
-      /* eslint-enable no-param-reassign */
     case 'form.errors':
-      renderErrors(value, invalid);
+      renderErrors(value, elements.invalid);
       break;
     case 'form.process':
-      processStateHandler(value, input, submitButton);
+      processStateHandler(value, input, elements.submitButton);
       break;
     case 'data.feeds':
-      renderFeeds(state.data.feeds);
+      renderData(state.data.feeds, elements.feedsDiv);
       break;
     case 'data.posts':
-      renderPosts(state.data.posts);
+      renderData(state.data.posts, elements.postsDiv);
       break;
     default:
       throw new Error(`Unknown path state: '${path}'!`);

@@ -10,7 +10,7 @@ export default (url, feeds) => {
     .notOneOf(links, i18next.t('errors.duplicate'));
   try {
     schema.validateSync(url, { abortEarly: false });
-    return [];
+    return null;
   } catch (err) {
     return err.errors;
   }

@@ -28,10 +28,15 @@ export default () => {
 
   const form = document.querySelector('form');
   const input = document.querySelector('input.form-control');
-  const submitButton = document.querySelector('button.btn');
-  const invalid = document.querySelector('div.invalid-feedback');
 
-  const watchedState = watcher(state, input, submitButton, invalid);
+  const elements = {
+    invalid: document.querySelector('div.invalid-feedback'),
+    submitButton: document.querySelector('button.btn'),
+    feedsDiv: document.querySelector('.feeds'),
+    postsDiv: document.querySelector('.posts'),
+  };
+
+  const watchedState = watcher(state, input, elements);
 
   const updatePosts = () => {
     const requests = state.data.feeds.map((feed) => {
@@ -79,19 +84,17 @@ export default () => {
 
   input.addEventListener('input', (e) => {
     watchedState.form.process = 'processing';
-    watchedState.form.errors = validate(e.target.value, state.data.feeds);
-    if (validate(e.target.value, state.data.feeds).length === 0) {
-      watchedState.form.valid = true;
-    } else {
+    const errors = validate(e.target.value, state.data.feeds);
+    if (errors !== null) {
+      watchedState.form.errors = errors;
       watchedState.form.valid = false;
+    } else {
+      watchedState.form.errors = [];
+      watchedState.form.valid = true;
     }
   });
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    watchedState.form.process = 'downloading';
-    const id = _.uniqueId();
-    const url = getURL(input.value);
+  const getData = (url, id) => {
     axios.get(url)
       .then((response) => {
         const { feed, posts } = parse(response.data);
@@ -109,5 +112,14 @@ export default () => {
         watchedState.form.valid = false;
         watchedState.form.process = 'failed';
       });
+  };
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const url = getURL(formData.get('url'));
+    const id = _.uniqueId();
+    watchedState.form.process = 'downloading';
+    getData(url, id);
   });
 };
