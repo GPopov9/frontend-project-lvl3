@@ -12,7 +12,7 @@ const highlightValid = (value, input, submitButton) => {
 };
 
 const renderErrors = (errors, invalid) => {
-  invalid.innerHTML = errors.map((error) => `${error}`).join();
+  invalid.innerHTML = errors.map((error) => `${error}`).join(' ');
 };
 
 const renderData = (data, div) => {
