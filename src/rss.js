@@ -13,29 +13,26 @@ const proxy = {
 
 const getURL = (data) => `${proxy.path}/${data}`;
 
-const getData = (watchedState, form) => {
-  const formData = new FormData(form);
-  const url = getURL(formData.get('url'));
-  const id = _.uniqueId();
-  /* eslint-disable no-param-reassign */
-  watchedState.form.process = 'downloading';
-  axios.get(url)
+const TIMEOUT = 5000;
+/* eslint-disable no-param-reassign */
+const getData = (url, id, state) => {
+  state.form.process = 'downloading';
+  axios.get(getURL(url))
     .then((response) => {
       const { feed, posts } = parse(response.data);
-      watchedState.data.feeds.push({ id, ...feed, link: url });
-      posts.forEach((post) => watchedState.data.posts.push({ id, ...post }));
-      watchedState.form.process = 'completed';
+      state.data.feeds.push({ id, ...feed, link: url });
+      state.data.posts = [...state.data.posts, ...posts];
+      state.form.process = 'completed';
     })
     .catch((err) => {
       const errStatus = err.response.status;
+      state.form.process = 'failed';
+      state.form.valid = false;
       if (errStatus === 404) {
-        watchedState.form.processError = [i18next.t('errors.undefined')];
+        state.form.processError = [i18next.t('errors.undefined')];
       } else {
         throw new Error(`Unknown error status: '${errStatus}'!`);
       }
-      watchedState.form.valid = false;
-      watchedState.form.process = 'failed';
-      /* eslint-enable no-param-reassign */
     });
 };
 
@@ -58,40 +55,40 @@ const updatePosts = (state) => {
         return _.differenceWith(newPosts, oldPosts, _.isEqual);
       }));
       if (newPostsAll.length !== 0) {
-        newPostsAll.forEach((item) => state.data.posts.unshift(item));
+        state.data.posts = [...newPostsAll, ...state.data.posts];
       }
     })
     .catch((err) => {
       throw new Error(`Unknown error status: '${err.message}'!`);
     })
-    .finally(() => setTimeout(updatePosts, 5000, state));
+    .finally(() => setTimeout(updatePosts, TIMEOUT, state));
 };
-
+/* eslint-enable no-param-reassign */
 export default () => {
   const state = {
     form: {
       process: 'processing',
-      valid: true,
       processError: null,
+      valid: true,
+      validationErrors: null,
     },
     data: {
       feeds: [],
       posts: [],
-      errors: [],
     },
   };
 
   const form = document.querySelector('form');
-  const input = document.querySelector('input.form-control');
 
   const elements = {
+    input: document.querySelector('input.form-control'),
     invalid: document.querySelector('div.invalid-feedback'),
     submitButton: document.querySelector('button.btn'),
     feedsDiv: document.querySelector('.feeds'),
     postsDiv: document.querySelector('.posts'),
   };
 
-  const watchedState = watcher(state, input, elements);
+  const watchedState = watcher(state, elements);
 
   i18next.init({
     lng: 'en',
@@ -103,21 +100,30 @@ export default () => {
     watchedState.form.process = 'completed';
     updatePosts(watchedState);
 
-    input.addEventListener('input', (e) => {
-      watchedState.form.process = 'processing';
-      const errors = validate(e.target.value, state.data.feeds);
-      if (errors !== null) {
-        watchedState.data.errors = errors;
-        watchedState.form.valid = false;
-      } else {
-        watchedState.data.errors = [];
+    elements.input.addEventListener('input', (e) => {
+      // @ts-ignore
+      if (e.target.value === '') {
         watchedState.form.valid = true;
+        watchedState.form.process = 'completed';
+      } else {
+        watchedState.form.process = 'processing';
+        const errors = validate(e.target.value, state.data.feeds);
+        if (errors !== null) {
+          watchedState.form.validationErrors = errors;
+          watchedState.form.valid = false;
+        } else {
+          watchedState.form.validationErrors = [];
+          watchedState.form.valid = true;
+        }
       }
     });
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      getData(watchedState, form);
+      const formData = new FormData(form);
+      const url = formData.get('url');
+      const id = _.uniqueId();
+      getData(url, id, watchedState);
     });
   });
 };

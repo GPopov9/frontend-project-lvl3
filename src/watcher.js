@@ -12,7 +12,7 @@ const highlightValid = (value, input, submitButton) => {
 };
 
 const renderErrors = (errors, invalid) => {
-  invalid.innerHTML = errors.map((error) => `${error}`).join(' ');
+  invalid.innerHTML = errors.join(' ');
 };
 
 const renderData = (data, div) => {
@@ -30,7 +30,7 @@ const processStateHandler = (process, input, submitButton) => {
       input.disabled = true;
       break;
     case 'failed':
-      submitButton.disabled = true;
+      submitButton.disabled = false;
       input.disabled = false;
       break;
     case 'completed':
@@ -44,18 +44,19 @@ const processStateHandler = (process, input, submitButton) => {
   }
 };
 
-export default (state, input, elements) => onChange(state, (path, value) => {
+export default (state, elements) => onChange(state, (path, value) => {
   switch (path) {
     case 'form.valid':
-      highlightValid(value, input, elements.submitButton);
+      highlightValid(value, elements.input, elements.submitButton);
+      break;
+    case 'form.process':
+      processStateHandler(value, elements.input, elements.submitButton);
       break;
     case 'form.processError':
       renderErrors(value, elements.invalid);
       break;
-    case 'form.process':
-      processStateHandler(value, input, elements.submitButton);
-      break;
-    case 'data.errors':
+
+    case 'form.validationErrors':
       renderErrors(value, elements.invalid);
       break;
     case 'data.feeds':
