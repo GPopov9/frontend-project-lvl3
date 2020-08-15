@@ -13,7 +13,7 @@ const proxy = {
 
 const getURL = (data) => `${proxy.path}/${data}`;
 
-const TIMEOUT = 5000;
+const timeout = 5000;
 /* eslint-disable no-param-reassign */
 const getData = (url, id, state) => {
   state.form.process = 'downloading';
@@ -27,7 +27,6 @@ const getData = (url, id, state) => {
     .catch((err) => {
       const errStatus = err.response.status;
       state.form.process = 'failed';
-      state.form.valid = false;
       if (errStatus === 404) {
         state.form.processError = [i18next.t('errors.undefined')];
       } else {
@@ -61,7 +60,7 @@ const updatePosts = (state) => {
     .catch((err) => {
       throw new Error(`Unknown error status: '${err.message}'!`);
     })
-    .finally(() => setTimeout(updatePosts, TIMEOUT, state));
+    .finally(() => setTimeout(updatePosts, timeout, state));
 };
 /* eslint-enable no-param-reassign */
 export default () => {
@@ -79,10 +78,11 @@ export default () => {
   };
 
   const form = document.querySelector('form');
+  const input = document.querySelector('input.form-control');
 
   const elements = {
-    input: document.querySelector('input.form-control'),
-    invalid: document.querySelector('div.invalid-feedback'),
+    input,
+    invalid: document.querySelector('div.invalid'),
     submitButton: document.querySelector('button.btn'),
     feedsDiv: document.querySelector('.feeds'),
     postsDiv: document.querySelector('.posts'),
@@ -100,7 +100,7 @@ export default () => {
     watchedState.form.process = 'completed';
     updatePosts(watchedState);
 
-    elements.input.addEventListener('input', (e) => {
+    input.addEventListener('input', (e) => {
       // @ts-ignore
       if (e.target.value === '') {
         watchedState.form.valid = true;
