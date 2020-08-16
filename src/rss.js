@@ -21,7 +21,8 @@ const getData = (url, id, state) => {
     .then((response) => {
       const { feed, posts } = parse(response.data);
       state.data.feeds.push({ id, ...feed, link: url });
-      state.data.posts = [...state.data.posts, ...posts];
+      const newPosts = posts.map((post) => ({ id, ...post }));
+      state.data.posts = [...state.data.posts, ...newPosts];
       state.form.process = 'completed';
     })
     .catch((err) => {
@@ -44,6 +45,7 @@ const updatePosts = (state) => {
       },
     });
   });
+
   axios.all(requests)
     .then((responses) => {
       const newPostsAll = _.flatten(responses.map((response) => {
@@ -53,6 +55,7 @@ const updatePosts = (state) => {
         const newPosts = posts.map((post) => ({ id: feedId, ...post }));
         return _.differenceWith(newPosts, oldPosts, _.isEqual);
       }));
+
       if (newPostsAll.length !== 0) {
         state.data.posts = [...newPostsAll, ...state.data.posts];
       }
